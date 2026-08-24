@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Daisuke Nagao
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 use serde_json::{Value, json};
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Child, ChildStdin, Command, Stdio};
