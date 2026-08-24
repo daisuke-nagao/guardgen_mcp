@@ -4,6 +4,19 @@ This crate exposes GuardGen 2.3.0 as a single MCP tool over newline-delimited
 JSON-RPC STDIO. It writes protocol messages to stdout only; diagnostics belong
 on stderr.
 
+## Install
+
+```text
+cargo install --locked --git https://github.com/daisuke-nagao/guardgen_mcp.git
+```
+
+This installs the `guardgen_mcp` binary into Cargo's bin directory
+(`~/.cargo/bin`, or `%USERPROFILE%\.cargo\bin` on Windows). If `cargo install`
+added that directory to `PATH` for you, `guardgen_mcp` is now on your PATH and
+an MCP client can launch it by name. If it isn't found, add that directory to
+`PATH` yourself (or point the MCP client at the full path printed by `cargo
+install`).
+
 ## Build and run
 
 ```text

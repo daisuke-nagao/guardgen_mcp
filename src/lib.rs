@@ -18,27 +18,42 @@ fn default_prefix() -> String {
     "UUID".to_owned()
 }
 
+/// Header linkage wrapper emitted inside the include guard.
+///
+/// `c` adds an `extern "C"` linkage section around the header body.
+/// `none` (default) and `cxx` emit only the include-guard scaffold.
 #[derive(Debug, Default, Deserialize, Serialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum Language {
+    /// Recommended default: no language-linkage wrapper.
     #[default]
     None,
     C,
     Cxx,
 }
 
+/// Line ending used in the generated source.
+///
+/// Default (and recommended when unspecified): `None` — uses the
+/// platform-native line ending instead of forcing LF or CRLF.
 #[derive(Debug, Default, Deserialize, Serialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum LineEnding {
+    /// Recommended default: platform-native line ending.
     #[default]
     None,
     Lf,
     Crlf,
 }
 
+/// UUID version used to make the guard macro name unique.
+///
+/// Default (and recommended when unspecified): `V7` — time-ordered UUIDs,
+/// preferred over `V4` for readability and sortability across guards.
 #[derive(Debug, Default, Deserialize, Serialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum UuidVersion {
+    /// Recommended default: time-ordered, sortable UUIDs.
     #[default]
     V7,
     V4,
@@ -47,16 +62,26 @@ pub enum UuidVersion {
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct GenerateIncludeGuardArguments {
+    /// Macro name prefix.
+    ///
+    /// Defaults to `"UUID"`. GuardGen appends a UUID segment to every
+    /// generated macro, so a custom prefix is only needed for a project naming
+    /// convention.
     #[serde(default = "default_prefix")]
     pub prefix: String,
+    /// Optional macro name suffix, appended after the UUID segment.
+    /// Default (recommended when unspecified): none (no suffix).
     #[serde(default)]
     pub suffix: Option<String>,
+    /// Default (recommended when unspecified): `none` — see [`Language`].
     #[serde(default)]
     #[schemars(default)]
     pub language: Language,
+    /// Default (recommended when unspecified): `none` — see [`LineEnding`].
     #[serde(default)]
     #[schemars(default)]
     pub line_ending: LineEnding,
+    /// Default (recommended when unspecified): `v7` — see [`UuidVersion`].
     #[serde(default)]
     #[schemars(default)]
     pub uuid_version: UuidVersion,
@@ -92,7 +117,10 @@ fn invalid_params(message: impl Into<String>) -> McpError {
 #[tool_router]
 impl GuardGenServer {
     #[tool(
-        description = "Generate a UUID-based C/C++ include guard source.",
+        description = "Generate a UUID-based C/C++ include guard source. \
+            All arguments are optional; if unspecified, defaults to \
+            prefix=\"UUID\", no suffix, language=none, line_ending=none \
+            (platform-native), and uuid_version=v7 (time-ordered UUID).",
         input_schema = rmcp::handler::server::common::schema_for_input::<GenerateIncludeGuardArguments>().unwrap()
     )]
     async fn generate_include_guard(
@@ -147,7 +175,12 @@ impl GuardGenServer {
 #[tool_handler(
     name = "guardgen_mcp",
     version = "0.1.0",
-    instructions = "Generate UUID-based C/C++ include guards with GuardGen."
+    instructions = "Use this server when writing or editing a C/C++ header \
+        and you need a UUID-based #ifndef/#define/#endif include guard. \
+        Call generate_include_guard; it returns a complete include-guard \
+        scaffold. Insert the header body between the opening and closing \
+        sections, before the final include-guard #endif. With language=c, \
+        insert the body inside the extern \"C\" linkage section."
 )]
 impl ServerHandler for GuardGenServer {}
 

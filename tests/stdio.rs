@@ -48,6 +48,15 @@ impl McpProcess {
         );
         assert_eq!(initialize["result"]["serverInfo"]["name"], "guardgen_mcp");
         assert_eq!(initialize["result"]["serverInfo"]["version"], "0.1.0");
+        let instructions = initialize["result"]["instructions"]
+            .as_str()
+            .expect("server instructions");
+        assert!(instructions.contains("scaffold"));
+        assert!(instructions.contains("between"));
+        assert!(instructions.contains("opening"));
+        assert!(instructions.contains("closing"));
+        assert!(!instructions.contains("both lines"));
+        assert!(!instructions.contains("collision-proof"));
         process.notify("notifications/initialized", json!({}));
         process
     }
@@ -127,6 +136,8 @@ fn stdio_initialize_lists_one_tool_and_defaults_generate_v7() {
     let tools = listed["result"]["tools"].as_array().expect("tools array");
     assert_eq!(tools.len(), 1);
     assert_eq!(tools[0]["name"], "generate_include_guard");
+    let tool_description = tools[0]["description"].as_str().expect("tool description");
+    assert!(!tool_description.contains("invariant when the header is renamed or moved"));
     let schema = &tools[0]["inputSchema"];
     let properties = schema["properties"].as_object().expect("schema properties");
     for property in [
@@ -156,6 +167,20 @@ fn stdio_initialize_lists_one_tool_and_defaults_generate_v7() {
             "missing enum value {value}"
         );
     }
+    let language_description = schema["$defs"]["Language"]["description"]
+        .as_str()
+        .expect("language description");
+    assert!(language_description.contains("extern"));
+    assert!(language_description.contains("linkage"));
+    assert!(language_description.contains("none"));
+    assert!(language_description.contains("cxx"));
+    assert!(!language_description.contains("no trailing comment"));
+
+    let prefix_description = properties["prefix"]["description"]
+        .as_str()
+        .expect("prefix description");
+    assert!(!prefix_description.contains("rename churn"));
+    assert!(!prefix_description.contains("cross-file collisions"));
 
     let first = process.call(3, json!({}));
     let first_text = text_result(&first);
