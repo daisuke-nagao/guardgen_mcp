@@ -3,6 +3,7 @@ name = "guardgen_mcp"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+exclude = ["/tests/workflows.rs"]
 
 [dependencies]
 guardgen = { git = "https://github.com/daisuke-nagao/GuardGen.git", version = "2.3.0" }
