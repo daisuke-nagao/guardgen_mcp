@@ -45,10 +45,34 @@ The result is the generated include-guard source as text content. Unknown
 arguments and invalid values return an MCP invalid-params error. File output
 options such as `output` and `overwrite` are not supported.
 
-## Checks
+## Development
+
+Create a repository-local virtual environment, install the development
+dependency, and install the Git hook:
 
 ```text
-cargo fmt -- --check
+uv venv
+uv pip install --requirement requirements-dev.txt
+uv run pre-commit install
+```
+
+The first hook run downloads isolated Node and Go environments. System-wide
+Node and Go installations are not required.
+
+Run every commit check against the repository:
+
+```text
+uv run pre-commit run --all-files
+```
+
+Update hook revisions when needed:
+
+```text
+uv run pre-commit autoupdate
+```
+
+Run the test suite separately:
+
+```text
 cargo test --locked
-cargo clippy --locked --all-targets --all-features -- -D warnings
 ```
