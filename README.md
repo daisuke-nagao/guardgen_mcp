@@ -7,7 +7,7 @@ on stderr.
 ## Install
 
 ```text
-cargo install --locked --git https://github.com/daisuke-nagao/guardgen_mcp.git
+cargo install --locked --git https://github.com/daisuke-nagao/guardgen_mcp.git  --tag v1.0.0
 ```
 
 This installs the `guardgen_mcp` binary into Cargo's bin directory
