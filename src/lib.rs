@@ -177,7 +177,7 @@ impl GuardGenServer {
 
 #[tool_handler(
     name = "guardgen_mcp",
-    version = "0.1.0",
+    version = "1.0.0",
     instructions = "Use this server when writing or editing a C/C++ header \
         and you need a UUID-based #ifndef/#define/#endif include guard. \
         Call generate_include_guard; it returns a complete include-guard \

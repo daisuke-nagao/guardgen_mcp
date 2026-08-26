@@ -42,7 +42,7 @@ impl McpProcess {
             json!({
                 "protocolVersion": "2025-06-18",
                 "capabilities": {},
-                "clientInfo": {"name": "guardgen-mcp-tests", "version": "0.1.0"}
+                "clientInfo": {"name": "guardgen-mcp-tests", "version": "1.0.0"}
             }),
         );
         assert!(
@@ -50,7 +50,7 @@ impl McpProcess {
             "initialize: {initialize}"
         );
         assert_eq!(initialize["result"]["serverInfo"]["name"], "guardgen_mcp");
-        assert_eq!(initialize["result"]["serverInfo"]["version"], "0.1.0");
+        assert_eq!(initialize["result"]["serverInfo"]["version"], "1.0.0");
         let instructions = initialize["result"]["instructions"]
             .as_str()
             .expect("server instructions");
