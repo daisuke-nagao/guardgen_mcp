@@ -179,7 +179,7 @@ fn ci_has_scheduled_three_target_test_matrix_and_quality_job() {
         "ci test matrix",
     );
     for required in [
-        "uses: taiki-e/install-action@82cd3e7658a6f96c86c0234aeeda1748937cb0a1",
+        "uses: taiki-e/install-action@fcf5432d9f50d67e37ee6e29bdb7a224ff67b4a7",
         "tool: cargo-about@0.9.2",
         "fallback: none",
         "cargo about generate --locked --fail --target ${{ matrix.target }}",
@@ -279,7 +279,7 @@ fn cd_is_tag_only_builds_unique_archives_and_publishes_after_all_legs() {
         "CD must generate license notices before packaging"
     );
     for required in [
-        "uses: taiki-e/install-action@82cd3e7658a6f96c86c0234aeeda1748937cb0a1",
+        "uses: taiki-e/install-action@fcf5432d9f50d67e37ee6e29bdb7a224ff67b4a7",
         "tool: cargo-about@0.9.2",
         "fallback: none",
     ] {
@@ -380,7 +380,7 @@ fn workflows_pin_actions_and_limit_release_permissions() {
         cd.contains("actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c"),
         "CD must use the approved download-artifact pin"
     );
-    let cargo_about_action = "taiki-e/install-action@82cd3e7658a6f96c86c0234aeeda1748937cb0a1";
+    let cargo_about_action = "taiki-e/install-action@fcf5432d9f50d67e37ee6e29bdb7a224ff67b4a7";
     for (name, workflow) in [("ci", ci.as_str()), ("cd", cd.as_str())] {
         assert_eq!(
             workflow.matches(cargo_about_action).count(),
