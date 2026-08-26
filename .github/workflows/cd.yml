@@ -35,11 +35,24 @@ jobs:
           cache: true
           rustflags: ""
 
+      - name: Install cargo-about
+        uses: taiki-e/install-action@fcf5432d9f50d67e37ee6e29bdb7a224ff67b4a7 # v2.86.8
+        with:
+          tool: cargo-about@0.9.2
+          fallback: none
+
       - name: Run tests
         run: cargo test --locked --target ${{ matrix.target }}
 
       - name: Build release binary
         run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Generate third-party licenses
+        run: >-
+          cargo about generate --locked --fail
+          --target ${{ matrix.target }}
+          --output-file "target/${{ matrix.target }}/release/THIRD-PARTY-LICENSES.html"
+          about.hbs
 
       - name: Package Unix archive
         if: runner.os != 'Windows'
@@ -48,11 +61,16 @@ jobs:
           TARGET: ${{ matrix.target }}
         run: |
           set -euo pipefail
-          binary="target/${TARGET}/release/guardgen_mcp"
-          test -f "$binary"
+          release_dir="target/${TARGET}/release"
+          binary="${release_dir}/guardgen_mcp"
+          report="${release_dir}/THIRD-PARTY-LICENSES.html"
+          for file in "$binary" "$report" LICENSE-MIT LICENSE-APACHE; do
+            test -s "$file"
+          done
+          cp LICENSE-MIT LICENSE-APACHE "$release_dir"
           archive="guardgen_mcp-${TARGET}.tar.gz"
-          tar -czf "$archive" -C "$(dirname "$binary")" "$(basename "$binary")"
-          test -f "$archive"
+          tar -czf "$archive" -C "$release_dir" "$(basename "$binary")" THIRD-PARTY-LICENSES.html LICENSE-MIT LICENSE-APACHE
+          test -s "$archive"
 
       - name: Package Windows archive
         if: runner.os == 'Windows'
@@ -60,11 +78,26 @@ jobs:
         env:
           TARGET: ${{ matrix.target }}
         run: |
-          $binary = "target/$env:TARGET/release/guardgen_mcp.exe"
-          if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) { throw "missing release binary: $binary" }
+          $release_dir = "target/$env:TARGET/release"
+          $binary = "$release_dir/guardgen_mcp.exe"
+          $report = "$release_dir/THIRD-PARTY-LICENSES.html"
+          $source_licenses = @("LICENSE-MIT", "LICENSE-APACHE")
+          $required_files = @($binary, $report) + $source_licenses
+          foreach ($file in $required_files) {
+            if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "missing release file: $file" }
+            if ((Get-Item -LiteralPath $file).Length -eq 0) { throw "empty release file: $file" }
+          }
+          Copy-Item -LiteralPath $source_licenses -Destination $release_dir
+          $archive_files = @(
+            "$release_dir/guardgen_mcp.exe"
+            "$release_dir/THIRD-PARTY-LICENSES.html"
+            "$release_dir/LICENSE-MIT"
+            "$release_dir/LICENSE-APACHE"
+          )
           $archive = "guardgen_mcp-$env:TARGET.zip"
-          Compress-Archive -LiteralPath $binary -DestinationPath $archive
+          Compress-Archive -LiteralPath $archive_files -DestinationPath $archive
           if (-not (Test-Path -LiteralPath $archive -PathType Leaf)) { throw "missing archive: $archive" }
+          if ((Get-Item -LiteralPath $archive).Length -eq 0) { throw "empty archive: $archive" }
 
       - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
