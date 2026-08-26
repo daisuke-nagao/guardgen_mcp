@@ -16,6 +16,8 @@ jobs:
         include:
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-musl
           - os: windows-2025
             target: x86_64-pc-windows-msvc
           - os: macos-26
@@ -126,5 +128,5 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          test "$(find dist -type f | wc -l)" -eq 3
+          test "$(find dist -type f | wc -l)" -eq 4
           gh release create "$TAG" --verify-tag --generate-notes dist/*

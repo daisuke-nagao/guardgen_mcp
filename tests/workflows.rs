@@ -1,8 +1,9 @@
 use std::fs;
 use std::path::PathBuf;
 
-const TARGETS: [(&str, &str); 3] = [
+const TARGETS: [(&str, &str); 4] = [
     ("ubuntu-24.04", "x86_64-unknown-linux-gnu"),
+    ("ubuntu-24.04", "x86_64-unknown-linux-musl"),
     ("windows-2025", "x86_64-pc-windows-msvc"),
     ("macos-26", "aarch64-apple-darwin"),
 ];
@@ -109,7 +110,7 @@ fn assert_matrix(job: &str, workflow_name: &str) {
             .filter(|line| line.trim_start().starts_with("- os:"))
             .count(),
         TARGETS.len(),
-        "{workflow_name} must contain exactly three matrix entries"
+        "{workflow_name} must contain exactly four matrix entries"
     );
     for (runner, target) in TARGETS {
         assert_contains(
@@ -145,7 +146,7 @@ fn assert_no_direct_shell_ref(workflow_name: &str, workflow: &str) {
 }
 
 #[test]
-fn ci_has_scheduled_three_target_test_matrix_and_quality_job() {
+fn ci_has_scheduled_four_target_test_matrix_and_quality_job() {
     let ci = workflow("ci.yml");
     let triggers = mapping_block(&ci, "on:", 0);
     for required in [
@@ -199,6 +200,7 @@ fn cargo_about_configuration_is_strict_and_release_scoped() {
 accepted = ["MIT", "Apache-2.0", "Unicode-3.0"]
 targets = [
     "x86_64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
     "x86_64-pc-windows-msvc",
     "aarch64-apple-darwin",
 ]
@@ -344,7 +346,7 @@ fn cd_is_tag_only_builds_unique_archives_and_publishes_after_all_legs() {
     );
     assert_contains(
         &publish,
-        "test \"$(find dist -type f | wc -l)\" -eq 3",
+        "test \"$(find dist -type f | wc -l)\" -eq 4",
         "cd release asset count",
     );
     assert_no_direct_shell_ref("cd", &cd);
