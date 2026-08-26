@@ -78,5 +78,18 @@ jobs:
           cache: true
           rustflags: ""
 
+      - name: Install cargo-about
+        uses: taiki-e/install-action@82cd3e7658a6f96c86c0234aeeda1748937cb0a1 # v2.85.13
+        with:
+          tool: cargo-about@0.9.2
+          fallback: none
+
+      - name: Check third-party licenses
+        run: >-
+          cargo about generate --locked --fail
+          --target ${{ matrix.target }}
+          --output-file "${{ runner.temp }}/THIRD-PARTY-LICENSES.html"
+          about.hbs
+
       - name: Run tests
         run: cargo test --locked --target ${{ matrix.target }}

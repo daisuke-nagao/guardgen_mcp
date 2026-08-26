@@ -28,6 +28,15 @@ Configure an MCP client to launch the built executable with no arguments. The
 server keeps one GuardGen generator alive for the session, so successive UUID
 v7 calls preserve GuardGen's monotonic generation state.
 
+## Release archives
+
+Each GitHub Release archive contains these four files at its root:
+
+- `guardgen_mcp` (`guardgen_mcp.exe` on Windows)
+- `THIRD-PARTY-LICENSES.html`
+- `LICENSE-MIT`
+- `LICENSE-APACHE`
+
 ## Tool
 
 The only advertised tool is `generate_include_guard`. Its optional arguments
@@ -76,6 +85,16 @@ Run the test suite separately:
 ```text
 cargo test --locked
 ```
+
+Generate the target-specific third-party license report after a release build:
+
+```text
+cargo install --locked --features cli --version 0.9.2 cargo-about
+cargo build --release --locked --target <target>
+cargo about generate --locked --fail --target <target> --output-file target/<target>/release/THIRD-PARTY-LICENSES.html about.hbs
+```
+
+The generated HTML remains under `target` and is not committed.
 
 ## License
 
