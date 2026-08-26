@@ -7,26 +7,86 @@ on stderr.
 ## Install
 
 ```text
-cargo install --locked --git https://github.com/daisuke-nagao/guardgen_mcp.git
+cargo install --locked --git https://github.com/daisuke-nagao/guardgen_mcp.git --tag v1.0.0
 ```
 
 This installs the `guardgen_mcp` binary into Cargo's bin directory
 (`~/.cargo/bin`, or `%USERPROFILE%\.cargo\bin` on Windows). If `cargo install`
 added that directory to `PATH` for you, `guardgen_mcp` is now on your PATH and
 an MCP client can launch it by name. If it isn't found, add that directory to
-`PATH` yourself (or point the MCP client at the full path printed by `cargo
-install`).
+`PATH` yourself or configure the MCP client with the full path to the
+executable.
+
+## Configure MCP clients
+
+GuardGen MCP uses STDIO and requires no command-line arguments. The examples
+below assume that `guardgen_mcp` is available on `PATH`.
+
+### Claude Code
+
+Register GuardGen MCP in the user scope so that it is available across
+projects:
+
+```text
+claude mcp add --scope user --transport stdio guardgen_mcp -- guardgen_mcp
+```
+
+Verify the configuration with:
+
+```text
+claude mcp get guardgen_mcp
+```
+
+The `--scope user` option stores the MCP server in Claude Code's user
+configuration. To use a project-specific or local configuration instead, use
+the corresponding Claude Code MCP scope.
+
+### Codex
+
+Register GuardGen MCP with Codex:
+
+```text
+codex mcp add guardgen_mcp -- guardgen_mcp
+```
+
+Verify the configuration with:
+
+```text
+codex mcp list
+```
+
+By default, Codex stores the MCP configuration in `~/.codex/config.toml`.
+The configuration is shared by Codex clients that use this configuration,
+including the Codex CLI and IDE extension.
+
+If `guardgen_mcp` is not on `PATH`, replace the final `guardgen_mcp` in either
+registration command with the full path to the executable.
 
 ## Build and run
 
+Build from source with:
+
 ```text
 cargo build --release --locked
+```
+
+Run the resulting executable directly with:
+
+```text
 target/release/guardgen_mcp
 ```
 
-Configure an MCP client to launch the built executable with no arguments. The
-server keeps one GuardGen generator alive for the session, so successive UUID
-v7 calls preserve GuardGen's monotonic generation state.
+On Windows, the executable is:
+
+```text
+target\release\guardgen_mcp.exe
+```
+
+To configure an MCP client to use a locally built binary, use its full path as
+the STDIO server command instead of `guardgen_mcp`.
+
+The server keeps one GuardGen generator alive for the MCP session, so
+successive UUID v7 calls preserve GuardGen's monotonic generation state.
 
 ## Release archives
 
@@ -36,6 +96,10 @@ Each GitHub Release archive contains these four files at its root:
 - `THIRD-PARTY-LICENSES.html`
 - `LICENSE-MIT`
 - `LICENSE-APACHE`
+
+After extracting an archive, either add the directory containing
+`guardgen_mcp` to `PATH` or configure the MCP client with the full path to the
+executable.
 
 ## Tool
 

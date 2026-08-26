@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-27
+
 ### Added
 
 - A newline-delimited JSON-RPC STDIO MCP server that exposes GuardGen 2.3.0
@@ -19,4 +21,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   across successive calls.
 - Cargo installation, build, and MCP client setup documentation.
 
-[Unreleased]: https://github.com/daisuke-nagao/guardgen_mcp/compare/9c776c98a253390b8aec4147fe9af00936219271...HEAD
+[Unreleased]: https://github.com/daisuke-nagao/guardgen_mcp/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/daisuke-nagao/guardgen_mcp/releases/tag/v1.0.0
