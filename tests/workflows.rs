@@ -92,6 +92,16 @@ fn assert_checkout_credentials_disabled(workflow_name: &str, workflow: &str) {
     assert!(checkout_count > 0, "{workflow_name} has no checkout step");
 }
 
+fn publish_job(cd: &str) -> String {
+    cd.split_once("\n  publish:\n")
+        .map(|(_, publish)| publish)
+        .expect("CD publish job")
+        .lines()
+        .take_while(|line| indentation(line) != 2)
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 #[test]
 fn workflows_enforce_minimum_security_policy() {
     let ci = workflow("ci.yml");
@@ -110,10 +120,7 @@ fn workflows_enforce_minimum_security_policy() {
         "CI must not receive write permission"
     );
 
-    let publish = cd
-        .split_once("\n  publish:\n")
-        .map(|(_, publish)| publish)
-        .expect("CD publish job");
+    let publish = publish_job(&cd);
     assert!(
         publish.contains("    permissions:\n      contents: write"),
         "CD publish job must explicitly receive the release permission"
@@ -122,5 +129,16 @@ fn workflows_enforce_minimum_security_policy() {
         cd.matches("contents: write").count(),
         1,
         "only the CD publish job may receive write permission"
+    );
+}
+
+#[test]
+fn publish_scope_excludes_following_jobs() {
+    let cd = "\n  publish:\n    permissions:\n      contents: read\n  unrelated:\n    permissions:\n      contents: write\n";
+    let publish = publish_job(cd);
+
+    assert!(
+        !publish.contains("  unrelated:\n"),
+        "the publish scope must stop before the next job"
     );
 }
